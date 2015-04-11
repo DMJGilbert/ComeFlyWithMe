@@ -6,7 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var flights = require('./routes/flights');
+var apiFlights = require('./routes/api/flights');
+var apiFlight = require('./routes/api/flight');
 
 var app = express();
 
@@ -29,7 +30,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/flights', flights);
+app.use('/api/flights', apiFlights);
+app.use('/api/flight', apiFlight);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {
