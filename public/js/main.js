@@ -151,12 +151,21 @@ function animate() {
 }
 
 
+var lat = 51.5033630;
+var lng = -0.1276250;
 
-var latlng = new google.maps.LatLng(-34.397, 150.644);
+var latlng = new google.maps.LatLng(lat, lng);
 var myOptions = {
-	zoom: 16,
+	zoom: 14,
 	disableDefaultUI: true,
 	center: latlng,
 	mapTypeId: google.maps.MapTypeId.SATELLITE
 };
 var map = new google.maps.Map(document.getElementById("map"), myOptions);
+
+setInterval(function(){ 
+	lat += 0.00001;
+	lng += 0.00000;
+	map.setCenter(new google.maps.LatLng(lat, lng)); 
+}, 1);
+
