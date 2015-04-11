@@ -84,8 +84,6 @@ function init() {
 
 		THREE.GeometryUtils.merge(geometry, plane);
 
-
-
 	}
 
 	mesh = new THREE.Mesh(geometry, material);
@@ -134,10 +132,10 @@ function animate() {
 
 	requestAnimationFrame(animate);
 
-	position = ((Date.now() - start_time) * 0.03) % 400;
+	position = ((Date.now() - start_time) * 0.03) % 8000;
 
-	camera.position.z -= 0.3;
-	camera.position.y = 300;
+	camera.position.z = -position + 8000;
+	camera.position.y = 400;
 
 	// camera.position.x = - position + 400;
 
@@ -150,11 +148,11 @@ function animate() {
 
 }
 
-
 var lat = 51.5033630;
 var lng = -0.1276250;
 
 var latlng = new google.maps.LatLng(lat, lng);
+
 var myOptions = {
 	zoom: 14,
 	disableDefaultUI: true,
