@@ -167,3 +167,11 @@ setInterval(function(){
 	map.setCenter(new google.maps.LatLng(lat, lng)); 
 }, 1);
 
+function getFlight() {	
+	$.ajax({
+	  url: "/flights/search?query="+document.getElementById('flightNo').val(),
+	}).done(function(data) {
+	 console.log('Success');
+	 console.log(data);
+	});
+}
