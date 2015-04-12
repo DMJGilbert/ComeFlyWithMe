@@ -15,6 +15,8 @@ var lastKnownLong, lastKnownLat, longDif, latDif;
 var lastClouds = 0;
 var flightStatus = '';
 
+var nextHeight;
+
 init();
 
 function init() {
@@ -36,6 +38,7 @@ function init() {
 	camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 3000);
 	camera.position.z = 6000;
 	camera.position.y = 1000;
+	nextHeight = 1000;
 
 	scene = new THREE.Scene();
 
@@ -196,6 +199,7 @@ function getFlightInfo(id) {
 
 				map.setZoom(convertAltToZoom(newData.trail[2]));
 				camera.position.y = 1000/20*(19-convertAltToZoom(newData.trail[2]));
+				// nextHeight = 1000/20*(19-convertAltToZoom(newData.trail[2]));
 			}
 		} else {
 			flightStatus = 'landed';
@@ -205,6 +209,13 @@ function getFlightInfo(id) {
 
 function updateFlightPath(){
 	// Returns a float with the angle between the two points
+
+	// if(camera.position.y > nextHeight && camera.position.y != nextHeight){
+	// 	camera.position.y -= 0.5;
+	// }else if (camera.position.y < nextHeight && camera.position.y != nextHeight) {
+	// 	camera.position.y += 0.5;
+	// }
+
 	var x = latDif - 0;
 	var dLon = longDif - 0
 
