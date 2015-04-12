@@ -156,10 +156,10 @@ var lng = -0.1276250;
 var latlng = new google.maps.LatLng(lat, lng);
 
 var myOptions = {
-	zoom: 14,
+	zoom: 11,
 	disableDefaultUI: true,
 	center: latlng,
-	mapTypeId: google.maps.MapTypeId.SATELLITE
+	mapTypeId: google.maps.MapTypeId.HYBRID
 };
 var map = new google.maps.Map(document.getElementById("map"), myOptions);
 
@@ -167,7 +167,7 @@ setInterval(function(){
 	if(flightId){
 		getFlightInfo(flightId);
 	}
-}, 1000);
+}, 5000);
 
 function getFlight() {	
 	$.ajax({
@@ -184,5 +184,29 @@ function getFlightInfo(id) {
 	}).done(function(data) {
 	var newData = JSON.parse(data)
 	  map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1])); 
+	  
+
+	    // Returns a float with the angle between the two points
+	    var x = newData.trail[3] - newData.trail[0];
+	    var dLon = newData.trail[4] - newData.trail[1];
+
+	    var y = Math.sin(dLon) * Math.cos(newData.trail[3]);
+
+    	  var x = Math.cos(newData.trail[0]) * Math.sin(newData.trail[3]) - Math.sin(newData.trail[0]) * Math.cos(newData.trail[3]) * Math.cos(dLon);
+
+    	var brng = Math.atan2(y, x);
+
+	    brng = brng * (180 / Math.PI);
+
+	  //if(angle > 0){
+	  	console.log(brng);
+	  	$('#map').css('transform', 'rotate('+(brng)+'deg)');
+	  //} else {
+	  	//$('#map').css('transform', 'rotate('+(angle)+'deg)');
+	  //}
 	});
+}
+
+ function RadiansToDegrees(radians)  {
+	    return radians * 180.0 / Math.PI;
 }
