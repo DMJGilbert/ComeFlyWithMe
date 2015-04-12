@@ -12,6 +12,8 @@ var windowHalfY = window.innerHeight / 2;
 var flightId = '';
 var lastKnownLong, lastKnownLat, longDif, latDif;
 
+var lastClouds = 0;
+
 init();
 
 function init() {
@@ -206,8 +208,6 @@ function getFlightInfo(id) {
 				brng += 180;
 			}
 
-			console.log(brng);
-
 			$('#map').css('transform', 'rotate(0deg)');
 			$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
 			map.setZoom(convertAltToZoom(newData.trail[2]));
@@ -227,14 +227,29 @@ function getWeather() {
 	}).done(function (data) {
 		var weatherData = JSON.parse(data);
 		calculateLightLevel(weatherData.dt, weatherData.sys.sunrise, weatherData.sys.sunset);
+
+		if (lastClouds + 10 < weatherData.clouds.all ||  lastClouds - 10 > weatherData.clouds.all){
+			scene.children.forEach(function (child){
+				child.geometry.faces.forEach(function (face) { 
+					console.log(weatherData.clouds.all);
+					if (Math.random() > weatherData.clouds.all){
+						face.visible = false; 
+					} else {
+						face.visible = true;
+					}
+				});
+			});
+
+			lastClouds = weatherData.clouds.all;
+		}
 	});
 }
 
 function calculateLightLevel(date, sunrise, sunset) {
 	if(date > sunrise && date < sunset){
-		$('#filterLight').css('background-colour', 'rgba(0, 0, 0, 0.1)');
+		$('#filterLight').css('background-color', 'rgba(0, 0, 0, 0.1)');
 	} else {
-		$('#filterLight').css('background-colour', 'rgba(0, 0, 0, 0.77)');
+		$('#filterLight').css('background-color', 'rgba(0, 0, 0, 0.77)');
 	}
 }
 
