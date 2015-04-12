@@ -23,6 +23,10 @@ router.get('/search', function (req, res) {
 				res.jsonp(data);
 			}
 		});
+	}else{
+		res.send({
+			error:'Please provide a query'
+		})
 	}
 });
 

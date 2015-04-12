@@ -10,6 +10,10 @@ router.get('/', function (req, res) {
 				res.send(body);
 			}
 		});
+	}else{
+		res.send({
+			error:'Please provide id'
+		})
 	}
 });
 
