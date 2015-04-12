@@ -162,8 +162,8 @@ setInterval(function () {
 	}
 }, 10000);
 
-setInterval(function (){
-	if(longDif){
+setInterval(function () {
+	if (longDif) {
 		updateFlightPath();
 	}
 }, 60);
@@ -182,7 +182,7 @@ function getFlightInfo(id) {
 		url: "/api/flight/?id=" + id
 	}).done(function (data) {
 		var newData = JSON.parse(data)
-		if(lastLat != newData.trail[0] && lastLng != newData.trail[1]){
+		if (lastLat != newData.trail[0] && lastLng != newData.trail[1]) {
 			map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
 
 			lat = lastLat = newData.trail[0];
@@ -204,7 +204,7 @@ function getFlightInfo(id) {
 
 			brng = brng * (180 / Math.PI);
 
-			if(brng < 0){
+			if (brng < 0) {
 				brng += 180;
 			}
 
@@ -215,7 +215,7 @@ function getFlightInfo(id) {
 	});
 }
 
-function updateFlightPath(){
+function updateFlightPath() {
 	lng -= longDif / 1000;
 	lat -= latDif / 1000;
 	map.setCenter(new google.maps.LatLng(lat, lng));
@@ -228,25 +228,53 @@ function getWeather() {
 		var weatherData = JSON.parse(data);
 		calculateLightLevel(weatherData.dt, weatherData.sys.sunrise, weatherData.sys.sunset);
 
-		if (lastClouds + 10 < weatherData.clouds.all ||  lastClouds - 10 > weatherData.clouds.all){
-			scene.children.forEach(function (child){
-				child.geometry.faces.forEach(function (face) { 
+		if (lastClouds + 10 < weatherData.clouds.all || lastClouds - 10 > weatherData.clouds.all) {
+			scene.children.forEach(function (child) {
+				child.geometry.faces.forEach(function (face) {
 					console.log(weatherData.clouds.all);
-					if (Math.random() > weatherData.clouds.all){
-						face.visible = false; 
+					if (Math.random() > weatherData.clouds.all) {
+						face.visible = false;
 					} else {
 						face.visible = true;
 					}
 				});
 			});
-
 			lastClouds = weatherData.clouds.all;
+			rerenderClouds();
 		}
 	});
 }
 
+function rerenderClouds() {
+	var length = scene.children.length;
+	for (var i = 0; i < length; i++) {
+		scene.remove(scene.children[0])
+	}
+	geometry = new THREE.Geometry();
+	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
+
+	var p = 20 / lastClouds;
+
+	for (var i = 0; i < (4000 / p); i++) {
+		plane.position.x = Math.random() * 1000 - 500;
+		plane.position.y = Math.random() * Math.random() * 200 - 15;
+		plane.position.z = i * p;
+		plane.rotation.z = Math.random() * Math.PI;
+		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
+		plane.rotation.x = 180;
+		THREE.GeometryUtils.merge(geometry, plane);
+	}
+
+	mesh = new THREE.Mesh(geometry, material);
+	scene.add(mesh);
+
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.z = -400;
+	scene.add(mesh);
+}
+
 function calculateLightLevel(date, sunrise, sunset) {
-	if(date > sunrise && date < sunset){
+	if (date > sunrise && date < sunset) {
 		$('#filterLight').css('background-color', 'rgba(0, 0, 0, 0.1)');
 	} else {
 		$('#filterLight').css('background-color', 'rgba(0, 0, 0, 0.77)');
