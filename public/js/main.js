@@ -13,6 +13,7 @@ var flightId = '';
 var lastKnownLong, lastKnownLat, longDif, latDif;
 
 var lastClouds = 0;
+var flightStatus = '';
 
 init();
 
@@ -128,7 +129,7 @@ function animate() {
 	position = ((Date.now() - start_time) * 0.005) % 4000;
 
 	camera.position.z = -position + 2000;
-	camera.position.y = 400;
+	camera.position.y = 1000;
 
 	// camera.position.x = - position + 400;
 
@@ -163,7 +164,7 @@ setInterval(function () {
 }, 10000);
 
 setInterval(function (){
-	if(longDif){
+	if(longDif && flightStatus != 'landed'){
 		updateFlightPath();
 	}
 }, 60);
@@ -182,35 +183,42 @@ function getFlightInfo(id) {
 		url: "/api/flight/?id=" + id
 	}).done(function (data) {
 		var newData = JSON.parse(data)
-		if(lastLat != newData.trail[0] && lastLng != newData.trail[1]){
-			map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
+		if(newData.status != 'landed'){
+			if(lastLat != newData.trail[0] && lastLng != newData.trail[1]){
+				map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
 
-			lat = lastLat = newData.trail[0];
-			lng = lastLng = newData.trail[1];
-			longDif = newData.trail[4] - newData.trail[1];
-			latDif = newData.trail[3] - newData.trail[0];
+				lat = lastLat = newData.trail[0];
+				lng = lastLng = newData.trail[1];
+				longDif = newData.trail[4] - newData.trail[1];
+				latDif = newData.trail[3] - newData.trail[0];
 
-			getWeather();
+				getWeather();
 
-			// Returns a float with the angle between the two points
-			var x = newData.trail[0] - newData.trail[3];
-			var dLon = newData.trail[1] - newData.trail[4];
+				// Returns a float with the angle between the two points
+				var x = newData.trail[0] - newData.trail[3];
+				var dLon = newData.trail[1] - newData.trail[4];
 
-			var y = Math.sin(dLon) * Math.cos(newData.trail[0]);
+				var y = Math.sin(dLon) * Math.cos(newData.trail[0]);
 
-			var x = Math.cos(newData.trail[3]) * Math.sin(newData.trail[0]) - Math.sin(newData.trail[3]) * Math.cos(newData.trail[0]) * Math.cos(dLon);
+				var x = Math.cos(newData.trail[3]) * Math.sin(newData.trail[0]) - Math.sin(newData.trail[3]) * Math.cos(newData.trail[0]) * Math.cos(dLon);
 
-			var brng = Math.atan2(y, x);
+				var brng = Math.atan2(y, x);
 
-			brng = brng * (180 / Math.PI);
+				brng = brng * (180 / Math.PI);
 
-			if(brng < 0){
-				brng += 180;
+				if(brng < 0){
+					brng += 180;
+				}
+
+				$('#map').css('transform', 'rotate(0deg)');
+				$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
+				map.setZoom(convertAltToZoom(newData.trail[2]));
+				camera.position.y = 1000/20*(19-convertAltToZoom(newData.trail[2]));
+				console.log(convertAltToZoom(newData.trail[2]));
+				console.log(camera.position.y);
 			}
-
-			$('#map').css('transform', 'rotate(0deg)');
-			$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
-			map.setZoom(convertAltToZoom(newData.trail[2]));
+		} else {
+			flightStatus = 'landed';
 		}
 	});
 }
