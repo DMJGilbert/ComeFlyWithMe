@@ -169,7 +169,7 @@ setInterval(function(){
 
 function getFlight() {	
 	$.ajax({
-	  url: "/flights/search?query="+document.getElementById('flightNo').val(),
+	  url: "/flights/search?query="+document.getElementById('flightNo').value,
 	}).done(function(data) {
 	 console.log('Success');
 	 console.log(data);
