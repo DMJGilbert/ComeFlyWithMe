@@ -188,19 +188,27 @@ function getFlightInfo(id) {
 			longDif = newData.trail[4] - newData.trail[1];
 			latDif = newData.trail[3] - newData.trail[0];
 
+			getWeather();
 
 			// Returns a float with the angle between the two points
-			var x = newData.trail[3] - newData.trail[0];
-			var dLon = newData.trail[4] - newData.trail[1];
+			var x = newData.trail[0] - newData.trail[3];
+			var dLon = newData.trail[1] - newData.trail[4];
 
-			var y = Math.sin(dLon) * Math.cos(newData.trail[3]);
+			var y = Math.sin(dLon) * Math.cos(newData.trail[0]);
 
-			var x = Math.cos(newData.trail[0]) * Math.sin(newData.trail[3]) - Math.sin(newData.trail[0]) * Math.cos(newData.trail[3]) * Math.cos(dLon);
+			var x = Math.cos(newData.trail[3]) * Math.sin(newData.trail[0]) - Math.sin(newData.trail[3]) * Math.cos(newData.trail[0]) * Math.cos(dLon);
 
 			var brng = Math.atan2(y, x);
 
 			brng = brng * (180 / Math.PI);
 
+			if(brng < 0){
+				brng += 180;
+			}
+
+			console.log(brng);
+
+			$('#map').css('transform', 'rotate(0deg)');
 			$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
 			map.setZoom(convertAltToZoom(newData.trail[2]));
 		}
@@ -211,6 +219,23 @@ function updateFlightPath(){
 	lng -= longDif / 1000;
 	lat -= latDif / 1000;
 	map.setCenter(new google.maps.LatLng(lat, lng));
+}
+
+function getWeather() {
+	$.ajax({
+		url: "/api/weather/?lat=" + lat + "&lng=" + lng,
+	}).done(function (data) {
+		var weatherData = JSON.parse(data);
+		calculateLightLevel(weatherData.dt, weatherData.sys.sunrise, weatherData.sys.sunset);
+	});
+}
+
+function calculateLightLevel(date, sunrise, sunset) {
+	if(date > sunrise && date < sunset){
+		$('#filterLight').css('background-colour', 'rgba(0, 0, 0, 0.1)');
+	} else {
+		$('#filterLight').css('background-colour', 'rgba(0, 0, 0, 0.77)');
+	}
 }
 
 function convertAltToZoom(alt) {

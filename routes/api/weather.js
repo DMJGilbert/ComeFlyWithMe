@@ -3,9 +3,10 @@ var router = express.Router();
 var request = require('request');
 
 /* GET users listing. */
-router.get('/api/weather', function (req, res) {
-	if (req.query.id) {
-		request("api.openweathermap.org/data/2.5/weather?lat=" + req.query.lat +"&lon=" + req.query.lng, function (error, response, body) {
+router.get('/', function (req, res) {
+	if (req.query.lat && req.query.lng) {
+		request("http://api.openweathermap.org/data/2.5/weather?lat=" + req.query.lat +"&lon=" + req.query.lng, function (error, response, body) {
+			
 			if (!error && response.statusCode == 200) {
 				res.send(body);
 			}
@@ -13,7 +14,7 @@ router.get('/api/weather', function (req, res) {
 	}else{
 		res.send({
 			error:'Please provide lat and long.'
-;		})
+		})
 	}
 });
 
