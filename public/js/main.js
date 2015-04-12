@@ -10,6 +10,7 @@ var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
 var flightId = '';
+var lastKnownLong, lastKnownLat, longDif, latDif;
 
 init();
 
@@ -109,15 +110,7 @@ function init() {
 	$('#canvasClouds').css('height', '100%');
 	$('#canvasClouds').css('left', '0');
 
-	document.addEventListener('mousemove', onDocumentMouseMove, false);
 	window.addEventListener('resize', onWindowResize, false);
-
-}
-
-function onDocumentMouseMove(event) {
-
-	mouseX = (event.clientX - windowHalfX) * 0.25;
-	mouseY = (event.clientY - windowHalfY) * 0.25;
 
 }
 
@@ -134,7 +127,7 @@ function animate() {
 
 	requestAnimationFrame(animate);
 
-	position = ((Date.now() - start_time) * 0.03) % 8000;
+	position = ((Date.now() - start_time) * 0.005) % 8000;
 
 	camera.position.z = -position + 8000;
 	camera.position.y = 400;
@@ -152,61 +145,84 @@ function animate() {
 
 var lat = 51.5033630;
 var lng = -0.1276250;
+var lastLat = 51.5033630;
+var lastLng = -0.1276250;
 
 var latlng = new google.maps.LatLng(lat, lng);
 
 var myOptions = {
-	zoom: 11,
+	zoom: 15,
 	disableDefaultUI: true,
 	center: latlng,
-	mapTypeId: google.maps.MapTypeId.HYBRID
+	mapTypeId: google.maps.MapTypeId.SATELLITE
 };
 var map = new google.maps.Map(document.getElementById("map"), myOptions);
 
-setInterval(function(){ 
-	if(flightId){
+setInterval(function () {
+	if (flightId) {
 		getFlightInfo(flightId);
 	}
-}, 5000);
+}, 10000);
 
-function getFlight() {	
+setInterval(function (){
+	if(longDif){
+		updateFlightPath();
+	}
+}, 60);
+
+function getFlight() {
 	$.ajax({
-	  url: "/api/flights/search?query="+document.getElementById('flightNo').value,
-	}).done(function(data) {
-	 location.href = '/flight?id='+data.result.response.flight.data[Object.keys(data.result.response.flight.data)[0]].identification.id;
+		url: "/api/flights/search?query=" + document.getElementById('flightNo').value,
+	}).done(function (data) {
+		location.href = '/flight?id=' + data.result.response.flight.data[Object.keys(data.result.response.flight.data)[0]].identification.id;
 	});
 }
 
 function getFlightInfo(id) {
 	flightId = id;
 	$.ajax({
-	  url: "/api/flight/?id="+id
-	}).done(function(data) {
-	var newData = JSON.parse(data)
-	  map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1])); 
-	  
+		url: "/api/flight/?id=" + id
+	}).done(function (data) {
+		var newData = JSON.parse(data)
+		if(lastLat != newData.trail[0] && lastLng != newData.trail[1]){
+			map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
 
-	    // Returns a float with the angle between the two points
-	    var x = newData.trail[3] - newData.trail[0];
-	    var dLon = newData.trail[4] - newData.trail[1];
+			lat = lastLat = newData.trail[0];
+			lng = lastLng = newData.trail[1];
+			longDif = newData.trail[4] - newData.trail[1];
+			latDif = newData.trail[3] - newData.trail[0];
 
-	    var y = Math.sin(dLon) * Math.cos(newData.trail[3]);
 
-    	  var x = Math.cos(newData.trail[0]) * Math.sin(newData.trail[3]) - Math.sin(newData.trail[0]) * Math.cos(newData.trail[3]) * Math.cos(dLon);
+			// Returns a float with the angle between the two points
+			var x = newData.trail[3] - newData.trail[0];
+			var dLon = newData.trail[4] - newData.trail[1];
 
-    	var brng = Math.atan2(y, x);
+			var y = Math.sin(dLon) * Math.cos(newData.trail[3]);
 
-	    brng = brng * (180 / Math.PI);
+			var x = Math.cos(newData.trail[0]) * Math.sin(newData.trail[3]) - Math.sin(newData.trail[0]) * Math.cos(newData.trail[3]) * Math.cos(dLon);
 
-	  //if(angle > 0){
-	  	console.log(brng);
-	  	$('#map').css('transform', 'rotate('+(brng)+'deg)');
-	  //} else {
-	  	//$('#map').css('transform', 'rotate('+(angle)+'deg)');
-	  //}
+			var brng = Math.atan2(y, x);
+
+			brng = brng * (180 / Math.PI);
+
+			$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
+			map.setZoom(convertAltToZoom(newData.trail[2]));
+		}
 	});
 }
 
- function RadiansToDegrees(radians)  {
-	    return radians * 180.0 / Math.PI;
+function updateFlightPath(){
+	lng -= longDif / 1000;
+	lat -= latDif / 1000;
+	map.setCenter(new google.maps.LatLng(lat, lng));
+}
+
+function convertAltToZoom(alt) {
+	var zoom = Math.round(Math.log(35200000 / alt) / Math.log(2));
+	if (zoom < 0) {
+		zoom = 0;
+	} else if (zoom > 19) {
+		zoom = 19;
+	}
+	return zoom;
 }
