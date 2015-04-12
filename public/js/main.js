@@ -266,7 +266,7 @@ function renderClouds() {
 
 	for (var i = 0; i < 4000-p; i++) {
 		plane.position.x = Math.random() * 1000 - 500;
-		plane.position.y = Math.random() * Math.random() * 200 - 15;
+		plane.position.y = Math.random() * Math.random() * 1200 - 15;
 		plane.position.z = i;
 		plane.rotation.z = Math.random() * Math.PI;
 		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
@@ -277,9 +277,9 @@ function renderClouds() {
 	mesh = new THREE.Mesh(geometry, material);
 	scene.add(mesh);
 
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.z = -400;
-	scene.add(mesh);
+	// mesh = new THREE.Mesh(geometry, material);
+	// mesh.position.z = -400;
+	// scene.add(mesh);
 }
 
 function calculateLightLevel(date, sunrise, sunset) {
