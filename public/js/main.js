@@ -73,20 +73,16 @@ function init() {
 
 	});
 
-	var plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
+	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
 
-	for (var i = 0; i < 1000; i++) {
-
+	for (var i = 0; i < 4000; i++) {
 		plane.position.x = Math.random() * 1000 - 500;
 		plane.position.y = Math.random() * Math.random() * 200 - 15;
-		plane.position.z = i * 8;
+		plane.position.z = i;
 		plane.rotation.z = Math.random() * Math.PI;
 		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
-
 		plane.rotation.x = 180;
-
 		THREE.GeometryUtils.merge(geometry, plane);
-
 	}
 
 	mesh = new THREE.Mesh(geometry, material);
@@ -127,9 +123,9 @@ function animate() {
 
 	requestAnimationFrame(animate);
 
-	position = ((Date.now() - start_time) * 0.005) % 8000;
+	position = ((Date.now() - start_time) * 0.005) % 4000;
 
-	camera.position.z = -position + 8000;
+	camera.position.z = -position + 2000;
 	camera.position.y = 400;
 
 	// camera.position.x = - position + 400;
