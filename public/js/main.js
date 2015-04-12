@@ -9,6 +9,8 @@ var start_time = Date.now();
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
+var flightId = '';
+
 init();
 
 function init() {
@@ -162,16 +164,25 @@ var myOptions = {
 var map = new google.maps.Map(document.getElementById("map"), myOptions);
 
 setInterval(function(){ 
-	lat += 0.00001;
-	lng += 0.00000;
-	map.setCenter(new google.maps.LatLng(lat, lng)); 
-}, 1);
+	if(flightId){
+		getFlightInfo(flightId);
+	}
+}, 1000);
 
 function getFlight() {	
 	$.ajax({
-	  url: "/flights/search?query="+document.getElementById('flightNo').value,
+	  url: "/api/flights/search?query="+document.getElementById('flightNo').value,
 	}).done(function(data) {
-	 console.log('Success');
-	 console.log(data);
+	 location.href = '/flight?id='+data.result.response.flight.data[Object.keys(data.result.response.flight.data)[0]].identification.id;
+	});
+}
+
+function getFlightInfo(id) {
+	flightId = id;
+	$.ajax({
+	  url: "/api/flight/?id="+id
+	}).done(function(data) {
+	var newData = JSON.parse(data)
+	  map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1])); 
 	});
 }
