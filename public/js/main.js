@@ -35,6 +35,7 @@ function init() {
 
 	camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 3000);
 	camera.position.z = 6000;
+	camera.position.y = 1000;
 
 	scene = new THREE.Scene();
 
@@ -129,7 +130,6 @@ function animate() {
 	position = ((Date.now() - start_time) * 0.005) % 4000;
 
 	camera.position.z = -position + 2000;
-	camera.position.y = 1000;
 
 	// camera.position.x = - position + 400;
 
@@ -195,29 +195,8 @@ function getFlightInfo(id) {
 
 				getWeather();
 
-				// Returns a float with the angle between the two points
-				var x = newData.trail[0] - newData.trail[3];
-				var dLon = newData.trail[1] - newData.trail[4];
-
-				var y = Math.sin(dLon) * Math.cos(newData.trail[0]);
-
-				var x = Math.cos(newData.trail[3]) * Math.sin(newData.trail[0]) - Math.sin(newData.trail[3]) * Math.cos(newData.trail[0]) * Math.cos(dLon);
-
-				var brng = Math.atan2(y, x);
-
-				brng = brng * (180 / Math.PI);
-
-				if (brng < 0) {
-					brng += 180;
-				}
-
-
-				$('#map').css('transform', 'rotate(0deg)');
-				$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
 				map.setZoom(convertAltToZoom(newData.trail[2]));
-				camera.position.y = 1000 / 20 * (19 - convertAltToZoom(newData.trail[2]));
-				console.log(convertAltToZoom(newData.trail[2]));
-				console.log(camera.position.y);
+				camera.position.y = 1000/20*(19-convertAltToZoom(newData.trail[2]));
 			}
 		} else {
 			flightStatus = 'landed';
@@ -225,7 +204,22 @@ function getFlightInfo(id) {
 	});
 }
 
-function updateFlightPath() {
+function updateFlightPath(){
+	// Returns a float with the angle between the two points
+	var x = latDif - 0;
+	var dLon = longDif - 0
+
+	var y = Math.sin(dLon) * Math.cos(0);
+
+	var x = Math.cos(latDif) * Math.sin(0) - Math.sin(latDif) * Math.cos(0) * Math.cos(dLon);
+
+	var brng = Math.atan2(y, x);
+
+	brng = brng * (180 / Math.PI);
+
+	$('#map').css('transform', 'rotate(0deg)');
+	$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
+
 	lng -= longDif / 1000;
 	lat -= latDif / 1000;
 	map.setCenter(new google.maps.LatLng(lat, lng));
