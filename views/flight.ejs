@@ -3,7 +3,12 @@
 
 <% include models %>
 
-<div style="margin: 10px; color: white; position: absolute; z-index:200;"><%= id %> </div>
+<div style="margin: 10px; color: white; position: absolute; text-align: left; font-size: 20px; z-index:200;">
+	Flight: <span id="flight"></span><br>
+	From: <span id="from"></span><br>
+	To: <span id="to"></span><br>
+
+</div>
 
 <div style="left:-50%; top:-100%; position: absolute; z-index:0; height: 400%; width: 200%;" id="map"></div>
 

@@ -187,6 +187,10 @@ function getFlightInfo(id) {
 	}).done(function (data) {
 		var newData = JSON.parse(data)
 
+		document.getElementById('flight').innerHTML = newData.flight;
+		document.getElementById('from').innerHTML = newData.from_city;
+		document.getElementById('to').innerHTML = newData.to_city;
+
 		if (newData.status != 'landed') {
 			if (lastLat != newData.trail[0] && lastLng != newData.trail[1]) {
 				map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
