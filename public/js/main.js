@@ -12,7 +12,8 @@ var windowHalfY = window.innerHeight / 2;
 var flightId = '';
 var lastKnownLong, lastKnownLat, longDif, latDif;
 
-var lastClouds = 0;
+var lastClouds;
+var flightStatus = '';
 
 init();
 
@@ -75,24 +76,24 @@ function init() {
 
 	});
 
-	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
-
-	for (var i = 0; i < 4000; i++) {
-		plane.position.x = Math.random() * 1000 - 500;
-		plane.position.y = Math.random() * Math.random() * 200 - 15;
-		plane.position.z = i;
-		plane.rotation.z = Math.random() * Math.PI;
-		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
-		plane.rotation.x = 180;
-		THREE.GeometryUtils.merge(geometry, plane);
-	}
-
-	mesh = new THREE.Mesh(geometry, material);
-	scene.add(mesh);
-
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.z = -400;
-	scene.add(mesh);
+//	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
+//
+//	for (var i = 0; i < 4000; i++) {
+//		plane.position.x = Math.random() * 1000 - 500;
+//		plane.position.y = Math.random() * Math.random() * 200 - 15;
+//		plane.position.z = i;
+//		plane.rotation.z = Math.random() * Math.PI;
+//		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
+//		plane.rotation.x = 180;
+//		THREE.GeometryUtils.merge(geometry, plane);
+//	}
+//
+//	mesh = new THREE.Mesh(geometry, material);
+//	scene.add(mesh);
+//
+//	mesh = new THREE.Mesh(geometry, material);
+//	mesh.position.z = -400;
+//	scene.add(mesh);
 
 	renderer = new THREE.WebGLRenderer({
 		antialias: false
@@ -128,7 +129,7 @@ function animate() {
 	position = ((Date.now() - start_time) * 0.005) % 4000;
 
 	camera.position.z = -position + 2000;
-	camera.position.y = 400;
+	camera.position.y = 1000;
 
 	// camera.position.x = - position + 400;
 
@@ -163,7 +164,7 @@ setInterval(function () {
 }, 10000);
 
 setInterval(function () {
-	if (longDif) {
+	if (longDif && flightStatus != 'landed') {
 		updateFlightPath();
 	}
 }, 60);
@@ -182,35 +183,44 @@ function getFlightInfo(id) {
 		url: "/api/flight/?id=" + id
 	}).done(function (data) {
 		var newData = JSON.parse(data)
-		if (lastLat != newData.trail[0] && lastLng != newData.trail[1]) {
-			map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
 
-			lat = lastLat = newData.trail[0];
-			lng = lastLng = newData.trail[1];
-			longDif = newData.trail[4] - newData.trail[1];
-			latDif = newData.trail[3] - newData.trail[0];
+		if (newData.status != 'landed') {
+			if (lastLat != newData.trail[0] && lastLng != newData.trail[1]) {
+				map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
 
-			getWeather();
+				lat = lastLat = newData.trail[0];
+				lng = lastLng = newData.trail[1];
+				longDif = newData.trail[4] - newData.trail[1];
+				latDif = newData.trail[3] - newData.trail[0];
 
-			// Returns a float with the angle between the two points
-			var x = newData.trail[0] - newData.trail[3];
-			var dLon = newData.trail[1] - newData.trail[4];
+				getWeather();
 
-			var y = Math.sin(dLon) * Math.cos(newData.trail[0]);
+				// Returns a float with the angle between the two points
+				var x = newData.trail[0] - newData.trail[3];
+				var dLon = newData.trail[1] - newData.trail[4];
 
-			var x = Math.cos(newData.trail[3]) * Math.sin(newData.trail[0]) - Math.sin(newData.trail[3]) * Math.cos(newData.trail[0]) * Math.cos(dLon);
+				var y = Math.sin(dLon) * Math.cos(newData.trail[0]);
 
-			var brng = Math.atan2(y, x);
+				var x = Math.cos(newData.trail[3]) * Math.sin(newData.trail[0]) - Math.sin(newData.trail[3]) * Math.cos(newData.trail[0]) * Math.cos(dLon);
 
-			brng = brng * (180 / Math.PI);
+				var brng = Math.atan2(y, x);
 
-			if (brng < 0) {
-				brng += 180;
+				brng = brng * (180 / Math.PI);
+
+				if (brng < 0) {
+					brng += 180;
+				}
+
+
+				$('#map').css('transform', 'rotate(0deg)');
+				$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
+				map.setZoom(convertAltToZoom(newData.trail[2]));
+				camera.position.y = 1000 / 20 * (19 - convertAltToZoom(newData.trail[2]));
+				console.log(convertAltToZoom(newData.trail[2]));
+				console.log(camera.position.y);
 			}
-
-			$('#map').css('transform', 'rotate(0deg)');
-			$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
-			map.setZoom(convertAltToZoom(newData.trail[2]));
+		} else {
+			flightStatus = 'landed';
 		}
 	});
 }
@@ -228,24 +238,14 @@ function getWeather() {
 		var weatherData = JSON.parse(data);
 		calculateLightLevel(weatherData.dt, weatherData.sys.sunrise, weatherData.sys.sunset);
 
-		if (lastClouds + 10 < weatherData.clouds.all || lastClouds - 10 > weatherData.clouds.all) {
-			scene.children.forEach(function (child) {
-				child.geometry.faces.forEach(function (face) {
-					console.log(weatherData.clouds.all);
-					if (Math.random() > weatherData.clouds.all) {
-						face.visible = false;
-					} else {
-						face.visible = true;
-					}
-				});
-			});
+		if (!lastClouds || (lastClouds + 10 < weatherData.clouds.all || lastClouds - 10 > weatherData.clouds.all)) {
 			lastClouds = weatherData.clouds.all;
-			rerenderClouds();
+			renderClouds();
 		}
 	});
 }
 
-function rerenderClouds() {
+function renderClouds() {
 	var length = scene.children.length;
 	for (var i = 0; i < length; i++) {
 		scene.remove(scene.children[0])
@@ -253,12 +253,12 @@ function rerenderClouds() {
 	geometry = new THREE.Geometry();
 	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
 
-	var p = 20 / lastClouds;
+	var p = 4000 / (lastClouds + 1);
 
-	for (var i = 0; i < (4000 / p); i++) {
+	for (var i = 0; i < 4000-p; i++) {
 		plane.position.x = Math.random() * 1000 - 500;
 		plane.position.y = Math.random() * Math.random() * 200 - 15;
-		plane.position.z = i * p;
+		plane.position.z = i;
 		plane.rotation.z = Math.random() * Math.PI;
 		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
 		plane.rotation.x = 180;
