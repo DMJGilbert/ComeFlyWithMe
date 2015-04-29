@@ -80,24 +80,24 @@ function init() {
 
 	});
 
-//	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
-//
-//	for (var i = 0; i < 4000; i++) {
-//		plane.position.x = Math.random() * 1000 - 500;
-//		plane.position.y = Math.random() * Math.random() * 200 - 15;
-//		plane.position.z = i;
-//		plane.rotation.z = Math.random() * Math.PI;
-//		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
-//		plane.rotation.x = 180;
-//		THREE.GeometryUtils.merge(geometry, plane);
-//	}
-//
-//	mesh = new THREE.Mesh(geometry, material);
-//	scene.add(mesh);
-//
-//	mesh = new THREE.Mesh(geometry, material);
-//	mesh.position.z = -400;
-//	scene.add(mesh);
+	//	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
+	//
+	//	for (var i = 0; i < 4000; i++) {
+	//		plane.position.x = Math.random() * 1000 - 500;
+	//		plane.position.y = Math.random() * Math.random() * 200 - 15;
+	//		plane.position.z = i;
+	//		plane.rotation.z = Math.random() * Math.PI;
+	//		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
+	//		plane.rotation.x = 180;
+	//		THREE.GeometryUtils.merge(geometry, plane);
+	//	}
+	//
+	//	mesh = new THREE.Mesh(geometry, material);
+	//	scene.add(mesh);
+	//
+	//	mesh = new THREE.Mesh(geometry, material);
+	//	mesh.position.z = -400;
+	//	scene.add(mesh);
 
 	renderer = new THREE.WebGLRenderer({
 		antialias: false
@@ -149,153 +149,149 @@ var lat = 51.5033630;
 var lng = -0.1276250;
 var lastLat = 51.5033630;
 var lastLng = -0.1276250;
+var map;
 
-var latlng = new google.maps.LatLng(lat, lng);
+require(["esri/map", "esri/geometry/Point"],
+		function (Map, Point) {
+			map = new Map("map", {
+				center: [lng, lat],
+				zoom: 20,
+				basemap: "satellite"
+			});
 
-var myOptions = {
-	zoom: 15,
-	disableDefaultUI: true,
-	center: latlng,
-	mapTypeId: google.maps.MapTypeId.SATELLITE
-};
-var map = new google.maps.Map(document.getElementById("map"), myOptions);
+			setInterval(function () {
+				if (flightId) {
+					getFlightInfo(flightId);
+				}
+			}, 10000);
 
-setInterval(function () {
-	if (flightId) {
-		getFlightInfo(flightId);
-	}
-}, 10000);
+			setInterval(function () {
+				if (longDif && flightStatus != 'landed') {
+					updateFlightPath();
+				}
+			}, 60);
 
-setInterval(function () {
-	if (longDif && flightStatus != 'landed') {
-		updateFlightPath();
-	}
-}, 60);
-
-function getFlight() {
-	$.ajax({
-		url: "/api/flights/search?query=" + document.getElementById('flightNo').value,
-	}).done(function (data) {
-		location.href = '/flight?id=' + data.result.response.flight.data[Object.keys(data.result.response.flight.data)[0]].identification.id;
-	});
-}
-
-function getFlightInfo(id) {
-	flightId = id;
-	$.ajax({
-		url: "/api/flight/?id=" + id
-	}).done(function (data) {
-		var newData = JSON.parse(data)
-
-		document.getElementById('flight').innerHTML = newData.flight;
-		document.getElementById('from').innerHTML = newData.from_city;
-		document.getElementById('to').innerHTML = newData.to_city;
-
-		if (newData.status != 'landed') {
-			if (lastLat != newData.trail[0] && lastLng != newData.trail[1]) {
-				map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
-
-				lat = lastLat = newData.trail[0];
-				lng = lastLng = newData.trail[1];
-				longDif = newData.trail[4] - newData.trail[1];
-				latDif = newData.trail[3] - newData.trail[0];
-
-				getWeather();
-
-				map.setZoom(convertAltToZoom(newData.trail[2]));
-				camera.position.y = 1000/20*(19-convertAltToZoom(newData.trail[2]));
-				// nextHeight = 1000/20*(19-convertAltToZoom(newData.trail[2]));
+			function getFlight() {
+				$.ajax({
+					url: "/api/flights/search?query=" + document.getElementById('flightNo').value,
+				}).done(function (data) {
+					location.href = '/flight?id=' + data.result.response.flight.data[Object.keys(data.result.response.flight.data)[0]].identification.id;
+				});
 			}
-		} else {
-			flightStatus = 'landed';
-		}
-	});
-}
 
-function updateFlightPath(){
-	// Returns a float with the angle between the two points
+			function getFlightInfo(id) {
+				flightId = id;
+				$.ajax({
+					url: "/api/flight/?id=" + id
+				}).done(function (data) {
+						var newData = JSON.parse(data)
 
-	// if(camera.position.y > nextHeight && camera.position.y != nextHeight){
-	// 	camera.position.y -= 0.5;
-	// }else if (camera.position.y < nextHeight && camera.position.y != nextHeight) {
-	// 	camera.position.y += 0.5;
-	// }
+						document.getElementById('flight').innerHTML = newData.flight;
+						document.getElementById('from').innerHTML = newData.from_city;
+						document.getElementById('to').innerHTML = newData.to_city;
 
-	var x = latDif - 0;
-	var dLon = longDif - 0
+						if (newData.status != 'landed') {
+							if (lastLat != newData.trail[0] && lastLng != newData.trail[1]) {
+								map.centerAt(new Point(newData.trail[0], newData.trail[1]));
 
-	var y = Math.sin(dLon) * Math.cos(0);
+									lat = lastLat = newData.trail[0]; lng = lastLng = newData.trail[1]; longDif = newData.trail[4] - newData.trail[1]; latDif = newData.trail[3] - newData.trail[0];
 
-	var x = Math.cos(latDif) * Math.sin(0) - Math.sin(latDif) * Math.cos(0) * Math.cos(dLon);
+									getWeather();
 
-	var brng = Math.atan2(y, x);
+									//map.setZoom(convertAltToZoom(newData.trail[2])); camera.position.y = 1000 / 20 * (19 - convertAltToZoom(newData.trail[2]));
+									// nextHeight = 1000/20*(19-convertAltToZoom(newData.trail[2]));
+								}
+							} else {
+								flightStatus = 'landed';
+							}
+						});
+				}
 
-	brng = brng * (180 / Math.PI);
+				function updateFlightPath() {
+					// Returns a float with the angle between the two points
 
-	$('#map').css('transform', 'rotate(0deg)');
-	$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
+					// if(camera.position.y > nextHeight && camera.position.y != nextHeight){
+					// 	camera.position.y -= 0.5;
+					// }else if (camera.position.y < nextHeight && camera.position.y != nextHeight) {
+					// 	camera.position.y += 0.5;
+					// }
 
-	lng -= longDif / 1000;
-	lat -= latDif / 1000;
-	map.setCenter(new google.maps.LatLng(lat, lng));
-}
+					var x = latDif - 0;
+					var dLon = longDif - 0
 
-function getWeather() {
-	$.ajax({
-		url: "/api/weather/?lat=" + lat + "&lng=" + lng,
-	}).done(function (data) {
-		var weatherData = JSON.parse(data);
-		calculateLightLevel(weatherData.dt, weatherData.sys.sunrise, weatherData.sys.sunset);
+					var y = Math.sin(dLon) * Math.cos(0);
 
-		if (!lastClouds || (lastClouds + 10 < weatherData.clouds.all || lastClouds - 10 > weatherData.clouds.all)) {
-			lastClouds = weatherData.clouds.all;
-			renderClouds();
-		}
-	});
-}
+					var x = Math.cos(latDif) * Math.sin(0) - Math.sin(latDif) * Math.cos(0) * Math.cos(dLon);
 
-function renderClouds() {
-	var length = scene.children.length;
-	for (var i = 0; i < length; i++) {
-		scene.remove(scene.children[0])
-	}
-	geometry = new THREE.Geometry();
-	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
+					var brng = Math.atan2(y, x);
 
-	var p = 4000 / (lastClouds + 1);
+					brng = brng * (180 / Math.PI);
 
-	for (var i = 0; i < 4000-p; i++) {
-		plane.position.x = Math.random() * 1000 - 500;
-		plane.position.y = Math.random() * Math.random() * 1200 - 15;
-		plane.position.z = i;
-		plane.rotation.z = Math.random() * Math.PI;
-		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
-		plane.rotation.x = 180;
-		THREE.GeometryUtils.merge(geometry, plane);
-	}
+					$('#map').css('transform', 'rotate(0deg)');
+					$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
 
-	mesh = new THREE.Mesh(geometry, material);
-	scene.add(mesh);
+					lng -= longDif / 1000;
+					lat -= latDif / 1000;
+					map.centerAt(new Point(lat, lng));
+				}
 
-	// mesh = new THREE.Mesh(geometry, material);
-	// mesh.position.z = -400;
-	// scene.add(mesh);
-}
+				function getWeather() {
+					$.ajax({
+						url: "/api/weather/?lat=" + lat + "&lng=" + lng,
+					}).done(function (data) {
+						var weatherData = JSON.parse(data);
+						calculateLightLevel(weatherData.dt, weatherData.sys.sunrise, weatherData.sys.sunset);
 
-function calculateLightLevel(date, sunrise, sunset) {
-	if (date > sunrise && date < sunset) {
-		$('#filterLight').css('background-color', 'rgba(0, 0, 0, 0.1)');
-	} else {
-		$('#filterLight').css('background-color', 'rgba(0, 0, 0, 0.77)');
-	}
-}
+						if (!lastClouds || (lastClouds + 10 < weatherData.clouds.all || lastClouds - 10 > weatherData.clouds.all)) {
+							lastClouds = weatherData.clouds.all;
+							renderClouds();
+						}
+					});
+				}
 
-function convertAltToZoom(alt) {
-	var zoom = Math.round(Math.log(35200000 / alt) / Math.log(2));
-	if (zoom < 0) {
-		zoom = 0;
-	} else if (zoom > 19) {
-		zoom = 19;
-	}
-	return zoom;
-}
+				function renderClouds() {
+					var length = scene.children.length;
+					for (var i = 0; i < length; i++) {
+						scene.remove(scene.children[0])
+					}
+					geometry = new THREE.Geometry();
+					plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
+
+					var p = 4000 / (lastClouds + 1);
+
+					for (var i = 0; i < 4000 - p; i++) {
+						plane.position.x = Math.random() * 1000 - 500;
+						plane.position.y = Math.random() * Math.random() * 1200 - 15;
+						plane.position.z = i;
+						plane.rotation.z = Math.random() * Math.PI;
+						plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
+						plane.rotation.x = 180;
+						THREE.GeometryUtils.merge(geometry, plane);
+					}
+
+					mesh = new THREE.Mesh(geometry, material);
+					scene.add(mesh);
+
+					// mesh = new THREE.Mesh(geometry, material);
+					// mesh.position.z = -400;
+					// scene.add(mesh);
+				}
+
+				function calculateLightLevel(date, sunrise, sunset) {
+					if (date > sunrise && date < sunset) {
+						$('#filterLight').css('background-color', 'rgba(0, 0, 0, 0.1)');
+					} else {
+						$('#filterLight').css('background-color', 'rgba(0, 0, 0, 0.77)');
+					}
+				}
+
+				function convertAltToZoom(alt) {
+					var zoom = Math.round(Math.log(35200000 / alt) / Math.log(2));
+					if (zoom < 0) {
+						zoom = 0;
+					} else if (zoom > 19) {
+						zoom = 19;
+					}
+					return zoom;
+				}
+			});
