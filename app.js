@@ -9,6 +9,7 @@ var routes = require('./routes/index');
 var apiFlights = require('./routes/api/flights');
 var apiFlight = require('./routes/api/flight');
 var apiWeather = require('./routes/api/weather');
+var apiFlightAware = require('./routes/api/flightaware');
 
 var app = express();
 
@@ -34,6 +35,7 @@ app.use('/', routes);
 app.use('/api/flights', apiFlights);
 app.use('/api/flight', apiFlight);
 app.use('/api/weather', apiWeather);
+app.use('/api/inflightinfo', apiFlightAware);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {
