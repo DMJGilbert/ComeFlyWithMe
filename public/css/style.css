@@ -1,12 +1,87 @@
-body {
-  background-color: transparent;
-  margin: 0px;
-  overflow: hidden;
-  font-family: Monospace;
-  font-size: 13px;
-  text-align: center;
-  font-weight: bold;
-  text-align: center; }
+* {
+  box-sizing: border-box; }
 
-a {
-  color: #0078ff; }
+html, body {
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden; }
+
+#map {
+  position: absolute;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%; }
+
+#timeOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+
+#weatherOverlay {
+  position: absolute;
+  width: 100%;
+  height: 100%; }
+
+#interfaceOverlay {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+  #interfaceOverlay #header {
+    width: 100%;
+    height: 50px;
+    background-color: #28303B;
+    color: #fcfcfc;
+    font-family: sans-serif;
+    line-height: 50px;
+    text-align: center;
+    letter-spacing: 17px;
+    font-size: 17px; }
+  #interfaceOverlay form {
+    position: absolute;
+    top: 90%;
+    max-width: 600px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0; }
+    #interfaceOverlay form input {
+      width: 80%;
+      height: 40px;
+      font-size: 30px;
+      padding: 5px 15px;
+      background-color: rgba(255, 255, 255, 0.4);
+      border: 0px solid transparent;
+      outline: none;
+      font-family: sans-serif;
+      letter-spacing: 5px;
+      font-size: 15px;
+      text-transform: uppercase;
+      color: #f7f7f7; }
+    #interfaceOverlay form button {
+      height: 40px;
+      width: 19%;
+      background-color: #28303B;
+      color: #fcfcfc;
+      font-family: sans-serif;
+      text-align: center;
+      letter-spacing: 5px;
+      font-size: 15px;
+      border: 0px solid transparent;
+      float: right; }
+  #interfaceOverlay #credit {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: #fcfcfc;
+    font-family: sans-serif;
+    text-align: center;
+    letter-spacing: 5px;
+    font-size: 13px; }
