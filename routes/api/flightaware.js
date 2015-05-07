@@ -15,7 +15,9 @@ router.get('/', function (req, res) {
 		    password: apiKey,
 		    query: {ident: req.query.id}
 		}).on('success', function(result, response) {
-		    console.log(result);
+		    res.send(result);
+		}).on('failure', function(result, response) {
+		    res.send(result);
 		});
 	}else{
 		res.send({

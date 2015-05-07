@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var apiFlight = require('./routes/api/flight');
 var apiWeather = require('./routes/api/weather');
+var apiInflightInfo = require('./routes/api/flightaware');
 
 var app = express();
 
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/api/flight', apiFlight);
 app.use('/api/weather', apiWeather);
+app.use('/api/inflightinfo', apiInflightInfo);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {

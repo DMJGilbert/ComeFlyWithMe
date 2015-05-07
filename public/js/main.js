@@ -11,6 +11,8 @@ var renderer;
 var scene;
 var material;
 
+var flightId = '';
+
 require(["esri/map", "esri/geometry/Point"], function (Map, Point) {
 	map = new Map("map", {
 		center: [lng, lat],
@@ -75,11 +77,14 @@ function init() {
 function checkFlight() {
 	var term = $('form>input').val();
 	$.ajax({
-		url: '/api/flight/search?query=' + term
+		url: '/api/inflightinfo/?id=' + term
 	}).done(function (data) {
 		if (data.error) {
 			showError();
-		} else {}
+			console.log(data);
+		} else {
+			console.log(data);
+		}
 	}).error(function () {
 		showError();
 	})
@@ -154,3 +159,77 @@ function generateClouds(clouds) {
 	mesh = new THREE.Mesh(geometry, material);
 	scene.add(mesh);
 }
+
+// function getFlightInfo(id) {
+// 	flightId = id;
+// 	$.ajax({
+// 		url: "/api/inflightinfo/?id=" + id
+// 	}).done(function (data) {
+// 		// var newData = JSON.parse(data)
+
+// 		// document.getElementById('flight').innerHTML = newData.flight;
+// 		// document.getElementById('from').innerHTML = newData.from_city;
+// 		// document.getElementById('to').innerHTML = newData.to_city;
+
+// 		// if (newData.status != 'landed') {
+// 		// 	if (lastLat != newData.trail[0] && lastLng != newData.trail[1]) {
+// 		// 		map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
+
+// 		// 		lat = lastLat = newData.trail[0];
+// 		// 		lng = lastLng = newData.trail[1];
+// 		// 		longDif = newData.trail[4] - newData.trail[1];
+// 		// 		latDif = newData.trail[3] - newData.trail[0];
+
+// 		// 		getWeather();
+
+// 		// 		map.setZoom(convertAltToZoom(newData.trail[2]));
+// 		// 		camera.position.y = 1000/20*(19-convertAltToZoom(newData.trail[2]));
+// 		// 		// nextHeight = 1000/20*(19-convertAltToZoom(newData.trail[2]));
+// 		// 	}
+// 		// } else {
+// 		// 	flightStatus = 'landed';
+// 		// }
+
+// 		console.log(data);
+// 	});
+// }
+
+// function updateFlightPath(){
+// 	// Returns a float with the angle between the two points
+
+// 	// if(camera.position.y > nextHeight && camera.position.y != nextHeight){
+// 	// 	camera.position.y -= 0.5;
+// 	// }else if (camera.position.y < nextHeight && camera.position.y != nextHeight) {
+// 	// 	camera.position.y += 0.5;
+// 	// }
+
+// 	var x = latDif - 0;
+// 	var dLon = longDif - 0
+
+// 	var y = Math.sin(dLon) * Math.cos(0);
+
+// 	var x = Math.cos(latDif) * Math.sin(0) - Math.sin(latDif) * Math.cos(0) * Math.cos(dLon);
+
+// 	var brng = Math.atan2(y, x);
+
+// 	brng = brng * (180 / Math.PI);
+
+// 	$('#map').css('transform', 'rotate(0deg)');
+// 	$('#map').css('transform', 'rotate(' + (brng) + 'deg)');
+
+// 	lng -= longDif / 1000;
+// 	lat -= latDif / 1000;
+// 	map.setCenter(new google.maps.LatLng(lat, lng));
+// }
+
+// setInterval(function () {
+// 	if (flightId) {
+// 		getFlightInfo(flightId);
+// 	}
+// }, 600000);
+
+// setInterval(function () {
+// 	if (longDif && flightStatus != 'landed') {
+// 		updateFlightPath();
+// 	}
+// }, 60);
