@@ -1,11 +1,11 @@
 var startTime = Date.now();
+
 var lat = 51.500183;
 var lng = -0.1290511;
 var lastLat;
 var lastLng;
+
 var map;
-var canvas;
-var context;
 var camera;
 var renderer;
 var scene;
@@ -22,36 +22,32 @@ require(["esri/map", "esri/geometry/Point"], function (Map, Point) {
 });
 
 function init() {
-	container = document.getElementById('weatherOverlay');
+
+	container = document.createElement('div');
+	document.body.appendChild(container);
+
+
+	container.style.position = 'absolute';
+	container.style.top = '0px';
+
 	camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 3000);
-	camera.position.z = 6000;
+	camera.position.z = 5000;
 	camera.position.y = 1000;
-	nextHeight = 1000;
+
 	scene = new THREE.Scene();
+
 	geometry = new THREE.Geometry();
-	var texture = THREE.ImageUtils.loadTexture('../img/cloud10.png', null, animate);
+
+	var texture = THREE.ImageUtils.loadTexture('img/cloud10.png', null, animate);
 	texture.magFilter = THREE.LinearMipMapLinearFilter;
 	texture.minFilter = THREE.LinearMipMapLinearFilter;
-	var fog = new THREE.Fog(0xffffff, -100, 3000);
-	material = new THREE.ShaderMaterial({
 
+	material = new THREE.ShaderMaterial({
 		uniforms: {
 			"map": {
 				type: "t",
 				value: texture
-			},
-			"fogColor": {
-				type: "c",
-				value: fog.color
-			},
-			"fogNear": {
-				type: "f",
-				value: fog.near
-			},
-			"fogFar": {
-				type: "f",
-				value: fog.far
-			},
+			}
 		},
 		vertexShader: document.getElementById('vs').textContent,
 		fragmentShader: document.getElementById('fs').textContent,
@@ -59,13 +55,21 @@ function init() {
 		depthTest: false,
 		transparent: true
 	});
+
+	mesh = new THREE.Mesh(geometry, material);
+	scene.add(mesh);
+
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.z = -8000;
+	scene.add(mesh);
+
 	renderer = new THREE.WebGLRenderer({
 		antialias: false
 	});
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.domElement.id = 'canvasClouds';
 	container.appendChild(renderer.domElement);
-	container.id = "weatherOverlay";
+
+	window.addEventListener('resize', onWindowResize, false);
 }
 
 function checkFlight() {
@@ -85,7 +89,7 @@ function checkFlight() {
 function showError() {
 	var button = $('form>button');
 	button.css('background-color', '#902636');
-	button[0].innerHTML = "OPPS";
+	button[0].innerHTML = "OOPS";
 }
 
 function clearError() {
@@ -112,8 +116,25 @@ function calculateLightLevel(date, sunrise, sunset) {
 	}
 }
 
+function onWindowResize(event) {
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function animate() {
+	position = ((Date.now() - startTime) * 0.03) % 4000;
+
+	camera.position.z = -position + 4000;
+	camera.rotation.x = -Math.PI / 2;
+	camera.rotation.y = 0;
+
+	renderer.render(scene, camera);
+	requestAnimationFrame(animate);
+}
+
 function generateClouds(clouds) {
-	console.log('gen');
+	clouds = clouds / 10;
 	var length = scene.children.length;
 	for (var i = 0; i < length; i++) {
 		scene.remove(scene.children[0])
@@ -121,33 +142,15 @@ function generateClouds(clouds) {
 	geometry = new THREE.Geometry();
 	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
 	var p = 4000 / (clouds + 1);
-	for (var i = 0; i < 4000 - p; i++) {
+	for (var i = 0; i < p; i++) {
 		plane.position.x = Math.random() * 1000 - 500;
 		plane.position.y = Math.random() * Math.random() * 1200 - 15;
-		plane.position.z = i;
+		plane.position.z = i * (clouds + 1);
 		plane.rotation.z = Math.random() * Math.PI;
-		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
+		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 5 + 0.5;
 		plane.rotation.x = 180;
 		THREE.GeometryUtils.merge(geometry, plane);
 	}
 	mesh = new THREE.Mesh(geometry, material);
 	scene.add(mesh);
-}
-
-function animate() {
-	console.log('animate')
-	position = ((Date.now() - startTime) * 0.03) % 8000;
-	camera.position.x += camera.position.x * 0.01;
-	camera.position.y += camera.position.y * 0.01;
-	camera.position.z = -position + 8000;
-	renderer.render(scene, camera);
-	requestAnimationFrame(animate);
-}
-
-function onWindowResize(event) {
-	if (camera && renderer) {
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-		renderer.setSize(window.innerWidth, window.innerHeight);
-	}
 }
