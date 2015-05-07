@@ -6,7 +6,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var apiFlight = require('./routes/api/flight');
 var apiWeather = require('./routes/api/weather');
 var apiInflightInfo = require('./routes/api/flightaware');
 
@@ -31,7 +30,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/api/flight', apiFlight);
 app.use('/api/weather', apiWeather);
 app.use('/api/inflightinfo', apiInflightInfo);
 
