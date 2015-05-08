@@ -15,11 +15,14 @@ var esriPoint;
 
 var flight = {};
 
+//latitude: 51.10524
+//longitude: -0.49579
+
 require(["esri/map", "esri/geometry/Point", "dojo/domReady!"], function (Map, Point) {
 	esriPoint = Point;
 	map = new Map("map", {
 		center: [lng, lat],
-		zoom: 18,
+		zoom: 15,
 		basemap: "satellite"
 	});
 	init();
@@ -36,7 +39,7 @@ function init() {
 	container.style.top = '0px';
 
 	camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 3000);
-	camera.position.z = 5000;
+	camera.position.z = 8000;
 	camera.position.y = 1000;
 
 	scene = new THREE.Scene();
@@ -87,7 +90,11 @@ function checkFlight() {
 			console.log('error');
 		} else {
 			flight = data.InFlightInfoResult;
-			map.centerAt(new esriPoint(flight.latitude, flight.longitude));
+			console.log(flight);
+			lat = flight.latitude;
+			lng = flight.longitude;
+			getWeather(lat, lng);
+			map.centerAt(new esriPoint(lng, lat));
 		}
 	}).error(function () {
 		showError();
@@ -118,11 +125,11 @@ function getWeather(lat, lng) {
 }
 
 function calculateLightLevel(date, sunrise, sunset) {
-	if (date > sunrise && date < sunset) {
-		$('#timeOverlay').css('background-color', 'rgba(0, 0, 0, 0.1)');
-	} else {
-		$('#timeOverlay').css('background-color', 'rgba(0, 0, 0, 0.77)');
-	}
+//	if (date > sunrise && date < sunset) {
+//		$('#timeOverlay').css('background-color', 'rgba(0, 0, 0, 0.1)');
+//	} else {
+//		$('#timeOverlay').css('background-color', 'rgba(0, 0, 0, 0.77)');
+//	}
 }
 
 function onWindowResize(event) {
@@ -143,18 +150,18 @@ function animate() {
 }
 
 function generateClouds(clouds) {
-	clouds = clouds / 10;
+	//clouds = 100 - clouds;
 	var length = scene.children.length;
 	for (var i = 0; i < length; i++) {
 		scene.remove(scene.children[0])
 	}
 	geometry = new THREE.Geometry();
 	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
-	var p = 4000 / (clouds + 1);
+	var p = 1500 * (clouds / 100);
 	for (var i = 0; i < p; i++) {
 		plane.position.x = Math.random() * 1000 - 500;
 		plane.position.y = Math.random() * Math.random() * 1200 - 15;
-		plane.position.z = i * (clouds + 1);
+		plane.position.z = Math.random() * 4000;
 		plane.rotation.z = Math.random() * Math.PI;
 		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 5 + 0.5;
 		plane.rotation.x = 180;
@@ -173,7 +180,16 @@ function getFlightInfo() {
 				console.log('error');
 			} else {
 				flight = data.InFlightInfoResult;
-				map.centerAt(new esriPoint(flight.latitude, flight.longitude));
+				console.log(data);
+				lat = flight.latitude;
+				lng = flight.longitude;
+				getWeather(lat, lng);
+				if(lat == 0 && lng == 0){
+					flight = undefined;
+					showFlightLanded();
+				}
+
+				map.centerAt(new esriPoint(lng, lat));
 
 				$('#map').css('transform', 'rotate(' + flight.heading + 'deg)');
 			}
@@ -185,23 +201,35 @@ function getFlightInfo() {
 }
 
 function updateFlightPath() {
-	$('#map').css('transform', 'rotate(' + (flight.heading) + 'deg)');
+	$('#map').css('transform', 'rotate(' + (360 - flight.heading) + 'deg)');
 
-	var distance = (flight.groundspeed / 3600000) * 60;
+	var distance = (flight.groundspeed / 1050) * 100;
 
-	console.log(LatLon.prototype.destinationPoint(distance, flight.heading, 6371000));
+	var newLatLong = new LatLon(lat, lng).destinationPoint(distance, flight.heading, 6371000);
+	lat = newLatLong.lat;
+	lng = newLatLong.lon;
 
-	// map.setCenter(new google.maps.LatLng(lat, lng));
+//	console.log(newLatLong);
+
+	map.centerAt(new esriPoint(lng, lat))
+}
+
+function showFlightLanded(){
+	document.getElementById('landedModal').style.display = 'block';
+}
+
+function hideFlightLanded(){
+	document.getElementById('landedModal').style.display = 'none';
 }
 
 setInterval(function () {
 	if (flight.ident) {
 		getFlightInfo();
 	}
-}, 600000);
+}, 60000);
 
 setInterval(function () {
 	if (flight.ident) {
-		updateFlightPath();
+		updateFlightPath()
 	}
-}, 60);
+}, 100);

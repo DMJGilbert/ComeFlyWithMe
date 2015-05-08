@@ -77,6 +77,39 @@ html, body {
       font-size: 15px;
       border: 0px solid transparent;
       float: right; }
+  #interfaceOverlay #landedModal {
+    max-width: 500px;
+    width: 90%;
+    margin: 10% auto;
+    background-color: #fcfcfc;
+    display: block;
+    overflow: auto; }
+    #interfaceOverlay #landedModal h1 {
+      background-color: #28303B;
+      color: #fcfcfc;
+      font-family: sans-serif;
+      line-height: 50px;
+      text-align: center;
+      letter-spacing: 10px;
+      font-size: 19px;
+      font-weight: 100;
+      margin: 0; }
+    #interfaceOverlay #landedModal p {
+      font-family: sans-serif;
+      color: #28303B;
+      padding: 10px;
+      letter-spacing: 2px; }
+    #interfaceOverlay #landedModal button {
+      height: 40px;
+      width: 19%;
+      background-color: #28303B;
+      color: #fcfcfc;
+      font-family: sans-serif;
+      text-align: center;
+      letter-spacing: 5px;
+      font-size: 15px;
+      border: 0px solid transparent;
+      float: right; }
   #interfaceOverlay #credit {
     position: absolute;
     bottom: 10px;
