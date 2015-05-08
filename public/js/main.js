@@ -11,9 +11,12 @@ var renderer;
 var scene;
 var material;
 
+var esriPoint;
+
 var flight = {};
 
-require(["esri/map", "esri/geometry/Point"], function (Map, Point) {
+require(["esri/map", "esri/geometry/Point", "dojo/domReady!"], function (Map, Point) {
+	esriPoint = Point;
 	map = new Map("map", {
 		center: [lng, lat],
 		zoom: 18,
@@ -84,7 +87,7 @@ function checkFlight() {
 			console.log('error');
 		} else {
 			flight = data.InFlightInfoResult;
-			map.centerAt(new Point(flight.latitude, flight.longitude));
+			map.centerAt(new esriPoint(flight.latitude, flight.longitude));
 		}
 	}).error(function () {
 		showError();
@@ -162,7 +165,7 @@ function generateClouds(clouds) {
 }
 
 function getFlightInfo() {
-	if (flight.ident){
+	if (flight.ident) {
 		$.ajax({
 			url: '/api/inflightinfo/?id=' + flight.ident
 		}).done(function (data) {
@@ -170,7 +173,7 @@ function getFlightInfo() {
 				console.log('error');
 			} else {
 				flight = data.InFlightInfoResult;
-				map.centerAt(new Point(flight.latitude, flight.longitude));
+				map.centerAt(new esriPoint(flight.latitude, flight.longitude));
 
 				$('#map').css('transform', 'rotate(' + flight.heading + 'deg)');
 			}
@@ -181,7 +184,7 @@ function getFlightInfo() {
 	}
 }
 
-function updateFlightPath(){
+function updateFlightPath() {
 	$('#map').css('transform', 'rotate(' + (flight.heading) + 'deg)');
 
 	var distance = (flight.groundspeed / 3600000) * 60;
@@ -198,7 +201,7 @@ setInterval(function () {
 }, 600000);
 
 setInterval(function () {
-	if () {
+	if (flight.ident) {
 		updateFlightPath();
 	}
 }, 60);
