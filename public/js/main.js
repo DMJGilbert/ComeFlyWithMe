@@ -94,6 +94,9 @@ function checkFlight() {
 			lat = flight.latitude;
 			lng = flight.longitude;
 			getWeather(lat, lng);
+			map.setZoom(convertAltToZoom(flight.altitude));
+			camera.position.y = 1500 / 20 * (19 - convertAltToZoom(flight.altitude));
+
 			map.centerAt(new ESRIPoint(lng, lat));
 		}
 	}).error(function () {
@@ -125,11 +128,11 @@ function getWeather(lat, lng) {
 }
 
 function calculateLightLevel(date, sunrise, sunset) {
-//	if (date > sunrise && date < sunset) {
-//		$('#timeOverlay').css('background-color', 'rgba(0, 0, 0, 0.1)');
-//	} else {
-//		$('#timeOverlay').css('background-color', 'rgba(0, 0, 0, 0.77)');
-//	}
+	if (date > sunrise && date < sunset) {
+		$('#timeOverlay').css('background-color', 'rgba(0, 0, 0, 0.1)');
+	} else {
+		$('#timeOverlay').css('background-color', 'rgba(0, 0, 0, 0.77)');
+	}
 }
 
 function onWindowResize(event) {
@@ -184,15 +187,15 @@ function getFlightInfo() {
 				lat = flight.latitude;
 				lng = flight.longitude;
 				getWeather(lat, lng);
-				if(lat == 0 && lng == 0){
+				if (lat == 0 && lng == 0) {
 					flight = undefined;
 					showFlightLanded();
 				}
 
 				map.centerAt(new ESRIPoint(lng, lat));
-                map.setZoom(convertAltToZoom(flight.altitude));
-                
-                camera.position.y = 1000/20*(19-convertAltToZoom(flight.altitude));
+				map.setZoom(convertAltToZoom(flight.altitude));
+
+				camera.position.y = 500 / 20 * (19 - convertAltToZoom(flight.altitude));
 
 				$('#map').css('transform', 'rotate(' + flight.heading + 'deg)');
 			}
@@ -212,16 +215,16 @@ function updateFlightPath() {
 	lat = newLatLong.lat;
 	lng = newLatLong.lon;
 
-//	console.log(newLatLong);
+	//	console.log(newLatLong);
 
 	map.centerAt(new ESRIPoint(lng, lat))
 }
 
-function showFlightLanded(){
+function showFlightLanded() {
 	document.getElementById('landedModal').style.display = 'block';
 }
 
-function hideFlightLanded(){
+function hideFlightLanded() {
 	document.getElementById('landedModal').style.display = 'none';
 }
 
@@ -236,13 +239,13 @@ function convertAltToZoom(alt) {
 }
 
 setInterval(function () {
-	if (flight.ident) {
+	if (flight && flight.ident) {
 		getFlightInfo();
 	}
 }, 60000);
 
 setInterval(function () {
-	if (flight.ident) {
+	if (flight && flight.ident) {
 		updateFlightPath()
 	}
 }, 100);
