@@ -174,6 +174,8 @@ function getFlightInfo() {
 			} else {
 				flight = data.InFlightInfoResult;
 				map.centerAt(new esriPoint(flight.latitude, flight.longitude));
+                
+                map.setZoom(convertAltToZoom(flight.altitude));
 
 				$('#map').css('transform', 'rotate(' + flight.heading + 'deg)');
 			}
@@ -192,6 +194,16 @@ function updateFlightPath() {
 	console.log(LatLon.prototype.destinationPoint(distance, flight.heading, 6371000));
 
 	// map.setCenter(new google.maps.LatLng(lat, lng));
+}
+
+function convertAltToZoom(alt) {
+	var zoom = Math.round(Math.log(35200000 / alt) / Math.log(2));
+	if (zoom < 0) {
+		zoom = 0;
+	} else if (zoom > 19) {
+		zoom = 19;
+	}
+	return zoom;
 }
 
 setInterval(function () {
