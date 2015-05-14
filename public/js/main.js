@@ -10,16 +10,16 @@ var camera;
 var renderer;
 var scene;
 var material;
+var mesh;
 
-var esriPoint;
+var ESRIPoint;
 
 var flight = {};
 
 //latitude: 51.10524
 //longitude: -0.49579
-
 require(["esri/map", "esri/geometry/Point", "dojo/domReady!"], function (Map, Point) {
-	esriPoint = Point;
+	ESRIPoint = Point;
 	map = new Map("map", {
 		center: [lng, lat],
 		zoom: 15,
@@ -31,7 +31,7 @@ require(["esri/map", "esri/geometry/Point", "dojo/domReady!"], function (Map, Po
 
 function init() {
 
-	container = document.createElement('div');
+	var container = document.createElement('div');
 	document.body.appendChild(container);
 
 
@@ -44,7 +44,7 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	geometry = new THREE.Geometry();
+	var geometry = new THREE.Geometry();
 
 	var texture = THREE.ImageUtils.loadTexture('img/cloud10.png', null, animate);
 	texture.magFilter = THREE.LinearMipMapLinearFilter;
@@ -94,7 +94,7 @@ function checkFlight() {
 			lat = flight.latitude;
 			lng = flight.longitude;
 			getWeather(lat, lng);
-			map.centerAt(new esriPoint(lng, lat));
+			map.centerAt(new ESRIPoint(lng, lat));
 		}
 	}).error(function () {
 		showError();
@@ -139,7 +139,7 @@ function onWindowResize(event) {
 }
 
 function animate() {
-	position = ((Date.now() - startTime) * 0.03) % 4000;
+	var position = ((Date.now() - startTime) * 0.03) % 4000;
 
 	camera.position.z = -position + 4000;
 	camera.rotation.x = -Math.PI / 2;
@@ -155,13 +155,13 @@ function generateClouds(clouds) {
 	for (var i = 0; i < length; i++) {
 		scene.remove(scene.children[0])
 	}
-	geometry = new THREE.Geometry();
-	plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
+	var geometry = new THREE.Geometry();
+	var plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
 	var p = 1500 * (clouds / 100);
 	for (var i = 0; i < p; i++) {
-		plane.position.x = Math.random() * 1000 - 500;
+		plane.position.x = Math.random() * 1000 - 100;
 		plane.position.y = Math.random() * Math.random() * 1200 - 15;
-		plane.position.z = Math.random() * 4000;
+		plane.position.z = Math.random() * 4000 + 20;
 		plane.rotation.z = Math.random() * Math.PI;
 		plane.scale.x = plane.scale.y = Math.random() * Math.random() * 5 + 0.5;
 		plane.rotation.x = 180;
@@ -189,7 +189,7 @@ function getFlightInfo() {
 					showFlightLanded();
 				}
 
-				map.centerAt(new esriPoint(lng, lat));
+				map.centerAt(new ESRIPoint(lng, lat));
 
 				$('#map').css('transform', 'rotate(' + flight.heading + 'deg)');
 			}
@@ -211,7 +211,7 @@ function updateFlightPath() {
 
 //	console.log(newLatLong);
 
-	map.centerAt(new esriPoint(lng, lat))
+	map.centerAt(new ESRIPoint(lng, lat))
 }
 
 function showFlightLanded(){
