@@ -191,6 +191,8 @@ function getFlightInfo() {
 
 				map.centerAt(new ESRIPoint(lng, lat));
                 map.setZoom(convertAltToZoom(flight.altitude));
+                
+                camera.position.y = 1000/20*(19-convertAltToZoom(flight.altitude));
 
 				$('#map').css('transform', 'rotate(' + flight.heading + 'deg)');
 			}
