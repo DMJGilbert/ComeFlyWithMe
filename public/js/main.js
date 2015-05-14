@@ -159,7 +159,7 @@ function generateClouds(clouds) {
 	var plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64));
 	var p = 1500 * (clouds / 100);
 	for (var i = 0; i < p; i++) {
-		plane.position.x = Math.random() * 1000 - 100;
+		plane.position.x = Math.random() * 1000 - 500;
 		plane.position.y = Math.random() * Math.random() * 1200 - 15;
 		plane.position.z = Math.random() * 4000 + 20;
 		plane.rotation.z = Math.random() * Math.PI;
@@ -190,6 +190,7 @@ function getFlightInfo() {
 				}
 
 				map.centerAt(new ESRIPoint(lng, lat));
+                map.setZoom(convertAltToZoom(flight.altitude));
 
 				$('#map').css('transform', 'rotate(' + flight.heading + 'deg)');
 			}
@@ -220,6 +221,16 @@ function showFlightLanded(){
 
 function hideFlightLanded(){
 	document.getElementById('landedModal').style.display = 'none';
+}
+
+function convertAltToZoom(alt) {
+	var zoom = Math.round(Math.log(35200000 / alt) / Math.log(2));
+	if (zoom < 0) {
+		zoom = 0;
+	} else if (zoom > 19) {
+		zoom = 19;
+	}
+	return zoom;
 }
 
 setInterval(function () {
