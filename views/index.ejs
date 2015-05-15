@@ -1,59 +1,59 @@
 <% include header %>
-	<% include models %>
+<% include models %>
 
-		<div id="map"></div>
+<div id="map"></div>
 
-		<div id="timeOverlay"></div>
+<div id="timeOverlay"></div>
 
-		<div id="weatherOverlay"></div>
+<div id="weatherOverlay"></div>
 
-		<div id="interfaceOverlay">
-			<div id="header">
-				COMEFLYWI<i class="fa fa-plane"></i>HME
-			</div>
+<div id="interfaceOverlay">
+	<div id="header">
+		COMEFLYWI<i class="fa fa-plane"></i>HME
+	</div>
 
-			<form onsubmit="return checkFlight()">
-				<input onkeydown="clearError()" placeholder="Flight number..."></input>
-				<button>FLY</button>
-			</form>
+	<form onsubmit="return checkFlight()">
+		<input onkeydown="clearError()" placeholder="Flight number..."></input>
+		<button>FLY</button>
+	</form>
 
-			<div id="flightDetails">
-				<i class="fa fa-4x fa-info"></i>
-				<div>
-					Flight Code: <span id="code"></span>
-				</div>
-				<div>
-					Origin: <span id="origin"></span>
-				</div>
-				<div>
-					Destination: <span id="destination"></span>
-				</div>
-			</div>
-			<div style="display: none;" id="landedModal">
-				<h1>Your flight has landed.</h1>
-				<p>
-					You are now safe to remove your seatbelts.
-				</p>
-				<button onclick="return hideFlightLanded()">
-					Clear
-				</button>
-			</div>
-
-
-			<div id="credit">
-				by DG &amp;&amp; MJM
-			</div>
-
+	<div id="flightDetails">
+		<i class="fa fa-4x fa-info"></i>
+		<div>
+			Flight Code: <span id="code"></span>
 		</div>
+		<div>
+			Origin: <span id="origin"></span>
+		</div>
+		<div>
+			Destination: <span id="destination"></span>
+		</div>
+	</div>
+	<div style="display: none;" id="landedModal">
+		<h1>Your flight has landed.</h1>
+		<p>
+			You are now safe to remove your seatbelts.
+		</p>
+		<button onclick="return hideFlightLanded()">
+			Clear
+		</button>
+	</div>
 
-		<script type="text/javascript" src="js/dms.js"></script>
-		<script type="text/javascript" src="js/latlon.js"></script>
 
-		<script type="text/javascript" src="js/three.min.js"></script>
-		<script type="text/javascript" src="//code.jquery.com/jquery-latest.min.js"></script>
-		<script type="text/javascript" src="//js.arcgis.com/3.13/"></script>
+	<div id="credit">
+		by DG &amp;&amp; MJM
+	</div>
 
-		<script type="text/javascript" src="js/main.js"></script>
+</div>
+
+<script type="text/javascript" src="js/dms.js"></script>
+<script type="text/javascript" src="js/latlon.js"></script>
+
+<script type="text/javascript" src="js/three.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="//js.arcgis.com/3.13/"></script>
+
+<script type="text/javascript" src="js/main.js"></script>
 
 
-		<% include footer %>
+<% include footer %>

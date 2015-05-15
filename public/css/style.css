@@ -10,10 +10,10 @@ html, body {
 
 #map {
   position: absolute;
-  left: -50%;
-  top: -50%;
-  width: 200%;
-  height: 200%; }
+  left: -75%;
+  top: -75%;
+  width: 250%;
+  height: 250%; }
 
 #timeOverlay {
   position: absolute;

@@ -27,6 +27,7 @@ require(["esri/map", "esri/geometry/Point", "esri/config", "dojo/domReady!"], fu
 		zoom: 15,
 		basemap: "satellite"
 	});
+
 	init();
 	getWeather(lat, lng);
 });
@@ -84,9 +85,13 @@ function init() {
 
 function checkFlight() {
 	var term = $('form>input').val();
-
+	if (term == '') {
+		term = 'random'
+	} else {
+		term = '?id=' + term;
+	}
 	$.ajax({
-		url: '/api/inflightinfo/?id=' + term
+		url: '/api/inflightinfo/' + term
 	}).done(function (data) {
 		if (data.error) {
 			showError();
