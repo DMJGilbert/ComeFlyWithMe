@@ -110,6 +110,41 @@ html, body {
       font-size: 15px;
       border: 0px solid transparent;
       float: right; }
+  #interfaceOverlay #flightDetails {
+    position: absolute;
+    top: calc(90% - 90px);
+    max-width: 600px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    background-color: #28303B;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    color: #fcfcfc;
+    font-weight: bold;
+    padding: 10px;
+    display: none; }
+    #interfaceOverlay #flightDetails .fa {
+      width: 9.2%;
+      float: left;
+      text-align: center;
+      color: #ccc; }
+    #interfaceOverlay #flightDetails div {
+      display: inline-block;
+      width: 90%;
+      font-size: 14px;
+      float: right; }
+      #interfaceOverlay #flightDetails div:nth-of-type(1), #interfaceOverlay #flightDetails div:nth-of-type(2) {
+        margin-bottom: 5px; }
+      #interfaceOverlay #flightDetails div span {
+        letter-spacing: 0px;
+        font-weight: normal;
+        color: #ccc;
+        display: inline-block;
+        width: 80%;
+        float: right; }
   #interfaceOverlay #credit {
     position: absolute;
     bottom: 10px;

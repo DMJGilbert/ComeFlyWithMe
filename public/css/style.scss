@@ -93,8 +93,7 @@ body {
 		margin: 10% auto;
 		background-color: #fcfcfc;
 		display: block;
-    	overflow: auto;
-
+		overflow: auto;
 		h1 {
 			background-color: #28303B;
 			color: #fcfcfc;
@@ -106,14 +105,12 @@ body {
 			font-weight: 100;
 			margin: 0;
 		}
-
-		p{
+		p {
 			font-family: sans-serif;
 			color: #28303B;
 			padding: 10px;
 			letter-spacing: 2px;
 		}
-
 		button {
 			height: 40px;
 			width: 19%;
@@ -125,6 +122,46 @@ body {
 			font-size: 15px;
 			border: 0px solid transparent;
 			float: right;
+		}
+	}
+	#flightDetails {
+		position: absolute;
+		top: calc(90% - 90px);
+		max-width: 600px;
+		width: 90%;
+		margin-left: auto;
+		margin-right: auto;
+		left: 0;
+		right: 0;
+		background-color: #28303B;
+		font-family: sans-serif;
+		letter-spacing: 1px;
+		color: #fcfcfc;
+		font-weight: bold;
+		padding: 10px;
+		display: none;
+		.fa {
+			width: 9.2%;
+			float: left;
+			text-align: center;
+			color: #ccc;
+		}
+		div {
+			display: inline-block;
+			width: 90%;
+			font-size: 14px;
+			float: right;
+			&:nth-of-type(1), &:nth-of-type(2) {
+				margin-bottom: 5px;
+			}
+			span {
+				letter-spacing: 0px;
+				font-weight: normal;
+				color: #ccc;
+				display: inline-block;
+				width: 80%;
+				float: right;
+			}
 		}
 	}
 	#credit {
