@@ -13,11 +13,13 @@ var material;
 var mesh;
 
 var ESRIPoint;
+var config;
 
 var flight = {};
 
 require(["esri/map", "esri/geometry/Point", "esri/config", "dojo/domReady!"], function (Map, Point, esriConfig) {
 	ESRIPoint = Point;
+	config = esriConfig;
 	esriConfig.defaults.map.panDuration = 1; // time in milliseconds, default panDuration: 350
 	esriConfig.defaults.map.panRate = 1; // default panRate: 25
 	esriConfig.defaults.map.zoomDuration = 100; // default zoomDuration: 500
@@ -131,11 +133,23 @@ function checkFlight() {
 				showError();
 			});
 
+			config.defaults.map.panDuration = 1; // time in milliseconds, default panDuration: 350
+			config.defaults.map.panRate = 1; // default panRate: 25
+			config.defaults.map.zoomDuration = 100; // default zoomDuration: 500
+			config.defaults.map.zoomRate = 1; // default zoomRate: 25
+
 			getWeather(lat, lng);
 			map.setZoom(convertAltToZoom(flight.altitude));
 			camera.position.y = 1500 / 20 * (19 - convertAltToZoom(flight.altitude));
 			map.disablePan();
 			map.centerAt(new ESRIPoint(lng, lat));
+
+			setTimeout(function () {
+				config.defaults.map.panDuration = 350; // time in milliseconds, default panDuration: 350
+				config.defaults.map.panRate = 25; // default panRate: 25
+				config.defaults.map.zoomDuration = 500; // default zoomDuration: 500
+				config.defaults.map.zoomRate = 25; // default zoomRate: 25
+			}, 400);
 		}
 	}).error(function () {
 		showError();
