@@ -95,16 +95,45 @@ function checkFlight() {
 	$.ajax({
 		url: '/api/inflightinfo/' + term
 	}).done(function (data) {
-		if (data.error) {
+
+		var newData = JSON.parse(data)
+
+		//document.getElementById('flight').innerHTML = newData.flight;
+		$('#origin').html(newData.from_city);
+		$('#destination').html(newData.to_city);
+
+		if (newData.status != 'landed') {
+			if (lastLat != newData.trail[0] && lastLng != newData.trail[1]) {
+				map.setCenter(new google.maps.LatLng(newData.trail[0], newData.trail[1]));
+
+				lat = newData.trail[0];
+				lng = newData.trail[1];
+				longDif = newData.trail[4] - newData.trail[1];
+				latDif = newData.trail[3] - newData.trail[0];
+
+				$('#code').html(flight.ident);
+				$('#flightDetails').show();
+
+				getWeather();
+
+				map.setZoom(convertAltToZoom(newData.trail[2]));
+				camera.position.y = 1000/20*(19-convertAltToZoom(newData.trail[2]));
+				// nextHeight = 1000/20*(19-convertAltToZoom(newData.trail[2]));
+			}
+		} else {
 			showError();
+			flightStatus = 'landed';
+		}
+
+
+		if (data.error) {
+			
 		} else {
 			flight = data.InFlightInfoResult;
 			console.log(flight);
 			lat = flight.latitude;
 			lng = flight.longitude;
 
-			$('#code').html(flight.ident);
-			$('#flightDetails').show();
 
 			$.ajax({
 				url: '/api/airport/?id=' + flight.origin
@@ -113,7 +142,7 @@ function checkFlight() {
 					console.log('error');
 				} else {
 					console.log(data);
-					$('#origin').html(data.AirportInfoResult.location);
+					
 
 				}
 			}).error(function () {
@@ -127,7 +156,7 @@ function checkFlight() {
 					console.log('error');
 				} else {
 					console.log(data);
-					$('#destination').html(data.AirportInfoResult.location);
+					
 				}
 			}).error(function () {
 				showError();
