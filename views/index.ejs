@@ -12,34 +12,6 @@
 		COMEFLYWI<i class="fa fa-plane"></i>HME
 	</div>
 
-	<form onsubmit="return checkFlight()">
-		<input onkeydown="clearError()" placeholder="Flight number..."></input>
-		<button>FLY</button>
-	</form>
-
-	<div id="flightDetails">
-		<i class="fa fa-4x fa-info"></i>
-		<div>
-			Flight Code: <span id="code"></span>
-		</div>
-		<div>
-			Origin: <span id="origin"></span>
-		</div>
-		<div>
-			Destination: <span id="destination"></span>
-		</div>
-	</div>
-	<div style="display: none;" id="landedModal">
-		<h1>Your flight has landed.</h1>
-		<p>
-			You are now safe to remove your seatbelts.
-		</p>
-		<button onclick="return hideFlightLanded()">
-			Clear
-		</button>
-	</div>
-
-
 	<div id="credit">
 		by DG &amp;&amp; MJM
 	</div>
